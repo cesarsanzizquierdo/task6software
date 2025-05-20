@@ -1,4 +1,4 @@
-name: Run HTML Tests and Linting
+name: CI/CD Roman Converter
 
 on:
   push:
@@ -37,8 +37,28 @@ jobs:
       - name: Install tidy for HTML linting
         run: sudo apt-get install -y tidy
 
-      - name: Lint paginaWeb.html
-        run: tidy -qe paginaWeb.html || true
+      - name: Lint index.html
+        run: tidy -qe index.html || true
 
       - name: Lint test.html
         run: tidy -qe test.html || true
+
+  deploy:
+    needs: [run-tests, lint-html]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy index.html to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
