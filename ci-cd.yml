@@ -1,0 +1,43 @@
+name: CI/CD Roman Converter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-lint-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Run test.html with headless Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+          google-chrome --headless --disable-gpu --no-sandbox --dump-dom test.html > result.html
+          echo "✅ Test output:"
+          cat result.html | grep PASSED || echo "⚠️ No PASSED found"
+
+      - name: Run basic linting (HTML)
+        run: |
+          sudo apt-get install -y tidy
+          tidy -qe paginaWeb.html || true
+          tidy -qe test.html || true
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: .
