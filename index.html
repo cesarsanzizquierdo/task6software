@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roman Numeral Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input {
+            padding: 8px;
+            margin: 10px 0;
+            width: calc(100% - 16px);
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Roman Numeral Converter</h2>
+    <input type="text" id="roman" placeholder="Enter Roman numeral">
+    <input type="text" id="integer" placeholder="Enter integer">
+</div>
+
+<script>
+    const romanInput = document.getElementById('roman');
+    const integerInput = document.getElementById('integer');
+
+    const romanToInt = (roman) => {
+        const romanMap = {I:1, V:5, X:10, L:50, C:100, D:500, M:1000};
+        let total = 0;
+        for (let i = 0; i < roman.length; i++) {
+            const curr = romanMap[roman[i]];
+            const next = romanMap[roman[i + 1]];
+            if (next > curr) {
+                total += next - curr;
+                i++;
+            } else {
+                total += curr;
+            }
+        }
+        return total;
+    };
+
+    const intToRoman = (num) => {
+        const values = [
+            { value: 1000, numeral: "M" },
+            { value: 900, numeral: "CM" },
+            { value: 500, numeral: "D" },
+            { value: 400, numeral: "CD" },
+            { value: 100, numeral: "C" },
+            { value: 90, numeral: "XC" },
+            { value: 50, numeral: "L" },
+            { value: 40, numeral: "XL" },
+            { value: 10, numeral: "X" },
+            { value: 9, numeral: "IX" },
+            { value: 5, numeral: "V" },
+            { value: 4, numeral: "IV" },
+            { value: 1, numeral: "I" },
+        ];
+        let result = "";
+        for (const { value, numeral } of values) {
+            while (num >= value) {
+                result += numeral;
+                num -= value;
+            }
+        }
+        return result;
+    };
+
+    romanInput.addEventListener('input', (e) => {
+        const value = e.target.value.toUpperCase().replace(/[^IVXLCDM]/g, '');
+        romanInput.value = value;
+        integerInput.value = value ? romanToInt(value) : '';
+    });
+
+    integerInput.addEventListener('input', (e) => {
+        const value = e.target.value.replace(/\D/g, '');
+        integerInput.value = value;
+        romanInput.value = value ? intToRoman(parseInt(value, 10)) : '';
+    });
+</script>
+
+</body>
+</html>

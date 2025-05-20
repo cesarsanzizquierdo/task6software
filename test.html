@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test - Roman Numeral Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .test-result {
+      margin: 5px 0;
+    }
+    .pass {
+      color: green;
+    }
+    .fail {
+      color: red;
+    }
+    #results {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<h1>Test Results</h1>
+<div id="results"></div>
+
+<script>
+  // Funciones copiadas de paginaWeb.html porque sino no puedo ejecutarlas para los tests
+  const romanToInt = (roman) => {
+    const romanMap = {I:1, V:5, X:10, L:50, C:100, D:500, M:1000};
+    let total = 0;
+    roman = roman.toUpperCase();
+    for (let i = 0; i < roman.length; i++) {
+      const curr = romanMap[roman[i]];
+      const next = romanMap[roman[i + 1]];
+      if (next > curr) {
+        total += next - curr;
+        i++;
+      } else {
+        total += curr;
+      }
+    }
+    return total;
+  };
+
+  const intToRoman = (num) => {
+    const values = [
+      { value: 1000, numeral: "M" },
+      { value: 900, numeral: "CM" },
+      { value: 500, numeral: "D" },
+      { value: 400, numeral: "CD" },
+      { value: 100, numeral: "C" },
+      { value: 90, numeral: "XC" },
+      { value: 50, numeral: "L" },
+      { value: 40, numeral: "XL" },
+      { value: 10, numeral: "X" },
+      { value: 9, numeral: "IX" },
+      { value: 5, numeral: "V" },
+      { value: 4, numeral: "IV" },
+      { value: 1, numeral: "I" },
+    ];
+    if (typeof num !== "number" || num < 1 || num > 3999) return "Invalid";
+    let result = "";
+    for (const { value, numeral } of values) {
+      while (num >= value) {
+        result += numeral;
+        num -= value;
+      }
+    }
+    return result;
+  };
+
+  function runTests() {
+    const results = document.getElementById("results");
+
+    const testCases = [
+      // Los test manuales
+      { name: "TC-1", result: intToRoman(1), expected: "I" },
+      { name: "TC-2", result: intToRoman(4), expected: "IV" },
+      { name: "TC-3", result: intToRoman(9), expected: "IX" },
+      { name: "TC-4", result: intToRoman(58), expected: "LVIII" },
+      { name: "TC-5", result: intToRoman(1994), expected: "MCMXCIV" },
+      { name: "TC-6", result: intToRoman(3999), expected: "MMMCMXCIX" },
+      { name: "TC-7", result: intToRoman(0), expected: "Invalid" },
+      { name: "TC-8", result: intToRoman(-5), expected: "Invalid" },
+      { name: "TC-9", result: romanToInt("III"), expected: 3 },
+      { name: "TC-10", result: romanToInt("XL"), expected: 40 },
+      { name: "TC-11", result: romanToInt("MCMXCIV"), expected: 1994 },
+      { name: "TC-12", result: romanToInt("MMMM"), expected: 4000 },
+      { name: "TC-13", result: romanToInt("IIII"), expected: 4 },
+
+      { name: "TC-14", result: isNaN(romanToInt("ABC")) ? "Invalid" : romanToInt("ABC"), expected: "Invalid" },
+
+      // Los test de IA
+      { name: "TC-15", result: intToRoman(1000), expected: "M" },
+      { name: "TC-16", result: intToRoman(2021), expected: "MMXXI" },
+      { name: "TC-17", result: intToRoman("ten"), expected: "Invalid" },
+      { name: "TC-18", result: intToRoman(4000), expected: "Invalid" },
+
+      { name: "TC-19", result: romanToInt("CDXLIV"), expected: 444 },
+      { name: "TC-20", result: romanToInt(""), expected: 0 },
+      { name: "TC-21", result: romanToInt("VX"), expected: 15 },
+      { name: "TC-22", result: romanToInt("MCMLXXXIV"), expected: 1984 },
+
+      { name: "TC-23", result: romanToInt("xii"), expected: 12 },
+      { name: "TC-24", result: intToRoman(3998), expected: "MMMCMXCVIII" }
+    ];
+
+    testCases.forEach(tc => {
+      const div = document.createElement("div");
+      div.className = "test-result";
+      const passed = tc.result === tc.expected;
+
+      div.classList.add(passed ? "pass" : "fail");
+      div.textContent = `${tc.name}: ${passed ? "✅ PASSED" : `❌ FAILED`} — expected "${tc.expected}", got "${tc.result}"`;
+      results.appendChild(div);
+    });
+  }
+
+
+  runTests(); //asi se ejecutan directamente cuando se abre el archivo
+</script>
+</body>
+</html>
