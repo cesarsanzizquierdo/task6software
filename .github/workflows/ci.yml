@@ -1,0 +1,28 @@
+name: Run HTML Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+
+      - name: Run test.html with headless Chrome
+        run: |
+          google-chrome --headless --disable-gpu --no-sandbox --dump-dom test.html > result.html
+          echo "🔎 Test output:"
+          cat result.html | grep PASSED || (echo "❌ No PASSED found" && exit 1)
