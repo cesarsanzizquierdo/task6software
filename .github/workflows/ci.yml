@@ -1,4 +1,4 @@
-name: Run HTML Tests
+name: Run HTML Tests and Linting
 
 on:
   push:
@@ -26,3 +26,19 @@ jobs:
           google-chrome --headless --disable-gpu --no-sandbox --dump-dom test.html > result.html
           echo "🔎 Test output:"
           cat result.html | grep PASSED || (echo "❌ No PASSED found" && exit 1)
+
+  lint-html:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install tidy for HTML linting
+        run: sudo apt-get install -y tidy
+
+      - name: Lint paginaWeb.html
+        run: tidy -qe paginaWeb.html || true
+
+      - name: Lint test.html
+        run: tidy -qe test.html || true
